@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 
-const COLORS = { p90: "#378ADD", p50: "#1D9E75", p10: "#D85A30", linear: "#f59e0b" };
+const COLORS = { p95: "#8B5CF6", p90: "#378ADD", p50: "#1D9E75", p10: "#D85A30", linear: "#f59e0b" };
 
 function fmt(v) {
   if (v >= 1e6) return "R" + (v / 1e6).toFixed(2) + "M";
@@ -103,18 +103,20 @@ export default function App() {
     finals.sort((a, b) => a - b);
     const pct = p => finals[Math.floor(p / 100 * N)];
 
-    const p5a = [], p50a = [], p75a = [];
-    const w5a = [], w50a = [], w75a = [];
+    const p5a = [], p50a = [], p75a = [], p95a = [];
+    const w5a = [], w50a = [], w75a = [], w95a = [];
 
     for (let y = 0; y <= years; y++) {
       const pv = paths.map(p => (typeof p[y] === "number" && !isNaN(p[y])) ? p[y] : 0).sort((a, b) => a - b);
       p5a.push(pv[Math.floor(0.05 * N)]);
       p50a.push(pv[Math.floor(0.50 * N)]);
       p75a.push(pv[Math.floor(0.75 * N)]);
+      p95a.push(pv[Math.floor(0.95 * N)]);
       const wv = wpaths.map(p => (p && typeof p[y] === "number" && !isNaN(p[y])) ? p[y] * 12 : (p && p.length ? p[p.length - 1] * 12 : 0)).sort((a, b) => a - b);
       w5a.push(wv[Math.floor(0.05 * N)]);
       w50a.push(wv[Math.floor(0.50 * N)]);
       w75a.push(wv[Math.floor(0.75 * N)]);
+      w95a.push(wv[Math.floor(0.95 * N)]);
     }
 
     // Linear portfolio path
@@ -164,6 +166,7 @@ export default function App() {
       p5: fmtDeplete(depletionYearIdx(p5a)),
       p50: fmtDeplete(depletionYearIdx(p50a)),
       p75: fmtDeplete(depletionYearIdx(p75a)),
+      p95: fmtDeplete(depletionYearIdx(p95a)),
       linear: fmtDeplete(depletionYearIdx(linPort)),
     };
 
@@ -173,6 +176,7 @@ export default function App() {
       p5: pct(5) / inflFactor,
       p50: pct(50) / inflFactor,
       p75: pct(75) / inflFactor,
+      p95: pct(95) / inflFactor,
       linear: linPort[linPort.length - 1] / inflFactor,
     };
 
@@ -182,18 +186,19 @@ export default function App() {
       p5: cagr(pct(5)),
       p50: cagr(pct(50)),
       p75: cagr(pct(75)),
+      p95: cagr(pct(95)),
       linear: cagr(linPort[linPort.length - 1]),
     };
 
     const finalContrib = cEsc > 0 ? contrib * Math.pow(1 + cEsc, years) : contrib;
 
     setResults({
-      p5: pct(5), p50: pct(50), p75: pct(75),
+      p5: pct(5), p50: pct(50), p75: pct(75), p95: pct(95),
       pctSuccess: Math.round(100 * finals.filter(v => v > 1).length / N),
       pctBeat: Math.round(100 * finals.filter(v => v > init).length / N),
       pctRuined: Math.round(100 * finals.filter(v => v === 0).length / N),
       totalIn: init + contrib * 12 * years + lumps.reduce((s, l) => s + l.amount, 0),
-      p5a, p50a, p75a, w5a, w50a, w75a, linPort, linW, dep, real, avgReturn,
+      p5a, p50a, p75a, p95a, w5a, w50a, w75a, w95a, linPort, linW, dep, real, avgReturn,
       labels: Array.from({ length: years + 1 }, (_, i) => "Yr " + i),
       avgInc: (totInc / N).toFixed(1), avgSkip: (totSkip / N).toFixed(1), finalContrib,
     });
@@ -221,6 +226,7 @@ export default function App() {
     c1Inst.current = new window.Chart(c1Ref.current.getContext("2d"), {
       type: "bar", data: { labels: results.labels, datasets: [
         { type: "bar",  label: "band",   data: band,            backgroundColor: "rgba(136,135,128,.18)", borderColor: "transparent", barPercentage: 1, categoryPercentage: 1, order: 5 },
+        { type: "line", label: "P95",    data: results.p95a,    borderColor: COLORS.p95,    borderWidth: 2,   pointRadius: 0, tension: .4, fill: false, borderDash: [2, 3], order: 1 },
         { type: "line", label: "P75",    data: results.p75a,    borderColor: COLORS.p90,    borderWidth: 2,   pointRadius: 0, tension: .4, fill: false, borderDash: [6, 3], order: 1 },
         { type: "line", label: "P50",    data: results.p50a,    borderColor: COLORS.p50,    borderWidth: 2.5, pointRadius: 0, tension: .4, fill: false, order: 0 },
         { type: "line", label: "P5",     data: results.p5a,     borderColor: COLORS.p10,    borderWidth: 2,   pointRadius: 0, tension: .4, fill: false, borderDash: [4, 4], order: 2 },
@@ -245,6 +251,7 @@ export default function App() {
     c2Inst.current = new window.Chart(c2Ref.current.getContext("2d"), {
       type: "bar", data: { labels: results.labels, datasets: [
         { type: "bar",  label: "W-band",   data: band2,           backgroundColor: "rgba(211,90,48,.12)", borderColor: "transparent", barPercentage: 1, categoryPercentage: 1, order: 5 },
+        { type: "line", label: "W-P95",    data: results.w95a,    borderColor: COLORS.p95,    borderWidth: 2,   pointRadius: 0, tension: .4, fill: false, borderDash: [2, 3], order: 1 },
         { type: "line", label: "W-P75",    data: results.w75a,    borderColor: COLORS.p90,    borderWidth: 2,   pointRadius: 0, tension: .4, fill: false, borderDash: [6, 3], order: 1 },
         { type: "line", label: "W-P50",    data: results.w50a,    borderColor: COLORS.p50,    borderWidth: 2.5, pointRadius: 0, tension: .4, fill: false, order: 0 },
         { type: "line", label: "W-P5",     data: results.w5a,     borderColor: COLORS.p10,    borderWidth: 2,   pointRadius: 0, tension: .4, fill: false, borderDash: [4, 4], order: 2 },
@@ -413,6 +420,7 @@ export default function App() {
           {[
             ["Median (P50)",      results ? fmt(results.p50) : "—", "50th percentile", null,        results ? results.dep.p50 : null,    results ? results.real.p50 : null,    results ? results.avgReturn.p50 : null],
             ["Optimistic (P75)",  results ? fmt(results.p75) : "—", "75th percentile", COLORS.p90,  results ? results.dep.p75 : null,    results ? results.real.p75 : null,    results ? results.avgReturn.p75 : null],
+            ["Best case (P95)",   results ? fmt(results.p95) : "—", "95th percentile", COLORS.p95,  results ? results.dep.p95 : null,    results ? results.real.p95 : null,    results ? results.avgReturn.p95 : null],
             ["Conservative (P5)", results ? fmt(results.p5) : "—",  "5th percentile",  COLORS.p10,  results ? results.dep.p5 : null,     results ? results.real.p5 : null,     results ? results.avgReturn.p5 : null],
             ["Linear projection", results ? fmt(results.linPort ? results.linPort[results.linPort.length - 1] : 0) : "—", "fixed return, no σ", COLORS.linear, results ? results.dep.linear : null, results ? results.real.linear : null, results ? results.avgReturn.linear : null],
           ].map(([label, value, sub, color, depleteAt, realVal, cagr]) => (
@@ -448,7 +456,7 @@ export default function App() {
         {/* Portfolio chart */}
         <div style={{ padding: "12px 16px 14px" }}>
           <div style={{ fontSize: 12, fontWeight: 600, color: "#444", marginBottom: 8 }}>Portfolio value</div>
-          {legend([[COLORS.p90, "P75 optimistic", true], [COLORS.p50, "P50 median", false], [COLORS.p10, "P5 conservative", true], [COLORS.linear, "Linear (no σ)", true]])}
+          {legend([[COLORS.p95, "P95 best case", true], [COLORS.p90, "P75 optimistic", true], [COLORS.p50, "P50 median", false], [COLORS.p10, "P5 conservative", true], [COLORS.linear, "Linear (no σ)", true]])}
           <div style={{ position: "relative", height: 220 }}><canvas ref={c1Ref} /></div>
         </div>
 
@@ -456,7 +464,7 @@ export default function App() {
         {withdraw > 0 && (
           <div style={{ padding: "12px 16px 14px", borderTop: "1px solid #eee" }}>
             <div style={{ fontSize: 12, fontWeight: 600, color: "#444", marginBottom: 8 }}>Annual income withdrawal</div>
-            {legend([[COLORS.p90, "P75 optimistic", true], [COLORS.p50, "P50 median", false], [COLORS.p10, "P5 conservative", true], [COLORS.linear, "Linear (no σ)", true]])}
+            {legend([[COLORS.p95, "P95 best case", true], [COLORS.p90, "P75 optimistic", true], [COLORS.p50, "P50 median", false], [COLORS.p10, "P5 conservative", true], [COLORS.linear, "Linear (no σ)", true]])}
             <div style={{ position: "relative", height: 200 }}><canvas ref={c2Ref} /></div>
           </div>
         )}
