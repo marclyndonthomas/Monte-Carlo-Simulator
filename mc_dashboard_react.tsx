@@ -29,7 +29,7 @@ export default function App() {
   const [ret, setRet]                 = useState(8);
   const [vol, setVol]                 = useState(15);
   const [years, setYears]             = useState(20);
-  const [sims, setSims]               = useState(1000);
+  const [sims, setSims]               = useState(2000);
   const [inflation, setInflation]     = useState(5.0);
   const [simMode, setSimMode]         = useState("independent"); // "independent" | "constrained"
   const [lumps, setLumps]             = useState([]);
@@ -391,7 +391,7 @@ export default function App() {
         {hr}
         {secLabel("Simulation")}
         {sRow("Time horizon (years)", 5, 40, 1, years, setYears, years + " yrs")}
-        {sRow("Simulations", 200, 2000, 100, sims, setSims, sims.toLocaleString())}
+        {sRow("Simulations", 500, 10000, 500, sims, setSims, sims.toLocaleString())}
         {sRow("Inflation rate (%/yr)", 0, 15, 0.5, inflation, setInflation, inflation.toFixed(1) + "%", "#888")}
 
         <button onClick={runSim} style={{ width: "100%", marginTop: 4, padding: "9px 0", fontSize: 13, fontWeight: 600, borderRadius: 8, border: "1px solid #ccc", background: "#fff", cursor: "pointer" }}>
