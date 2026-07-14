@@ -425,7 +425,7 @@ export default function App() {
         {/* Metric cards */}
         <div style={{ display: "flex", borderBottom: "1px solid #eee", flexWrap: "wrap" }}>
           {[
-            ["Median (P50)",      results ? fmt(results.p50) : "—", "50th percentile", null,        results ? results.dep.p50 : null,    results ? results.real.p50 : null,    results ? results.avgReturn.p50 : null],
+            ["Median (P50)",      results ? fmt(results.p50) : "—", "50th percentile", COLORS.p50,  results ? results.dep.p50 : null,    results ? results.real.p50 : null,    results ? results.avgReturn.p50 : null],
             ["Optimistic (P75)",  results ? fmt(results.p75) : "—", "75th percentile", COLORS.p90,  results ? results.dep.p75 : null,    results ? results.real.p75 : null,    results ? results.avgReturn.p75 : null],
             ["Best case (P95)",   results ? fmt(results.p95) : "—", "95th percentile", COLORS.p95,  results ? results.dep.p95 : null,    results ? results.real.p95 : null,    results ? results.avgReturn.p95 : null],
             ["Conservative (P5)", results ? fmt(results.p5) : "—",  "5th percentile",  COLORS.p10,  results ? results.dep.p5 : null,     results ? results.real.p5 : null,     results ? results.avgReturn.p5 : null],
