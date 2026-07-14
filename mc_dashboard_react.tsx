@@ -385,7 +385,14 @@ export default function App() {
 
         {hr}
         {secLabel("Market assumptions")}
-        {sRow("Expected annual return (%)", 1, 20, .5, ret, setRet, ret.toFixed(1) + "%")}
+        {sRow(simMode === "constrained" ? "Expected return (geo. mean %)" : "Expected return (arith. mean %)", 1, 20, .5, ret, setRet, ret.toFixed(1) + "%")}
+        {results && results.avgReturn.p50 != null && (
+          <div style={{ fontSize: 11, color: "#888", marginTop: -8, marginBottom: 10 }}>
+            {simMode === "constrained"
+              ? <>Geometric mean · median CAGR ≈ <strong style={{ color: "#1D9E75" }}>{results.avgReturn.p50.toFixed(2)}%</strong></>
+              : <>Arithmetic mean · median CAGR ≈ <strong style={{ color: "#1D9E75" }}>{results.avgReturn.p50.toFixed(2)}%</strong> after σ drag</>}
+          </div>
+        )}
         {sRow("Annual volatility / σ (%)", 1, 40, .5, vol, setVol, vol.toFixed(1) + "%")}
 
         {hr}
