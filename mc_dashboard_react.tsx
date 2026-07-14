@@ -384,7 +384,7 @@ export default function App() {
         {lumps.length > 0 && <div style={{ fontSize: 11, color: "#888", marginBottom: 8 }}>Total: <strong style={{ color: "#1D9E75" }}>R{lumps.reduce((s, l) => s + l.amount, 0).toLocaleString()}</strong></div>}
 
         {hr}
-        {secLabel("Market assumptions")}
+        {secLabel("Portfolio return target")}
         {sRow(simMode === "constrained" ? "Expected return (geo. mean %)" : "Expected return (arith. mean %)", 1, 20, .5, ret, setRet, ret.toFixed(1) + "%")}
         {results && results.avgReturn.p50 != null && (
           <div style={{ fontSize: 11, color: "#888", marginTop: -8, marginBottom: 10 }}>
