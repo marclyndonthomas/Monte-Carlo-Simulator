@@ -461,6 +461,16 @@ export default function App() {
                 : <>Customised — differs from {activeModel.name.replace(/^(DNA|Monarch Integrate) /, "")}</>}
             </div>
           )}
+          {activeModel && (() => {
+            const modelCost = modelRange === "monarch" ? activeModel.totalEffectiveCost : activeModel.ter;
+            const requiredGross = activeModel.nominalReturn + modelCost;
+            return (
+              <div style={{ fontSize: 11, color: "#666", marginTop: 3, background: "#f8f8f6", border: "1px solid #eee", borderRadius: 5, padding: "5px 7px" }}>
+                To net this category's {activeModel.nominalReturn.toFixed(1)}% target after its own {modelCost.toFixed(2)}% cost, this model needs to earn{" "}
+                <strong style={{ color: "#333" }}>{requiredGross.toFixed(2)}%</strong> gross · doesn't include advice/platform fees
+              </div>
+            );
+          })()}
         </div>
 
         {sRow(simMode === "constrained" ? "Expected return (geo. mean %)" : "Expected return (arith. mean %)", 1, 20, .5, ret, setRet, ret.toFixed(1) + "%")}
