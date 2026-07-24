@@ -33,8 +33,8 @@ export default function App() {
   const [years, setYears]             = useState(20);
   const [sims, setSims]               = useState(2000);
   const [inflation, setInflation]     = useState(5.0);
-  const [adviceFee, setAdviceFee]     = useState(0);            // %/yr — ongoing advisor fee, deducted from expected return
-  const [platformFee, setPlatformFee] = useState(0);            // %/yr — LISP/platform/product fee, on top of the model's own cost, deducted from expected return
+  const [adviceFee, setAdviceFee]     = useState(0.5);          // %/yr — ongoing advisor fee, deducted from expected return
+  const [platformFee, setPlatformFee] = useState(0.5);          // %/yr — LISP/platform/product fee, on top of the model's own cost, deducted from expected return
   const otherFees = adviceFee + platformFee;
   const [simMode, setSimMode]         = useState("independent"); // "independent" | "constrained"
   const [modelRange, setModelRange]   = useState("dna");         // "dna" | "monarch" — which preset list is shown
@@ -312,7 +312,7 @@ export default function App() {
   );
 
   // Exact-value number box (no slider), for fields advisors need to enter precisely (e.g. for a Record of Advice).
-  const sRowN = (label, min, max, step, val, set, prefix, col) => (
+  const sRowN = (label, min, max, step, val, set, prefix, col, suffix) => (
     <div style={{ marginBottom: 12 }}>
       <div style={{ fontSize: 12, color: "#666", marginBottom: 3 }}>{label}</div>
       <div style={{ display: "flex", alignItems: "center", gap: 6, border: "1px solid #ccc", borderRadius: 6, padding: "4px 8px", background: "#fff" }}>
@@ -321,6 +321,7 @@ export default function App() {
           onChange={e => { const v = e.target.value === "" ? 0 : Number(e.target.value); if (!Number.isNaN(v)) set(v); }}
           onFocus={e => e.target.select()}
           style={{ flex: 1, width: "100%", padding: "3px 0", fontSize: 12, fontWeight: 600, color: col || "#222", border: "none", outline: "none" }} />
+        {suffix && <span style={{ fontSize: 12, color: col || "#666" }}>{suffix}</span>}
       </div>
     </div>
   );
@@ -477,8 +478,8 @@ export default function App() {
         <div style={{ fontSize: 11, color: "#888", marginTop: -4, marginBottom: 8 }}>
           Fees not already included in the return above (a model preset's return already nets out that model's own cost). Both are deducted from the expected return before the simulation runs.
         </div>
-        {sRow("Advice fee (%/yr)", 0, 3, .05, adviceFee, setAdviceFee, adviceFee.toFixed(2) + "%", adviceFee > 0 ? "#D85A30" : undefined)}
-        {sRow("Platform / product fee (%/yr)", 0, 3, .05, platformFee, setPlatformFee, platformFee.toFixed(2) + "%", platformFee > 0 ? "#D85A30" : undefined)}
+        {sRowN("Advice fee (%/yr)", 0, 10, .05, adviceFee, setAdviceFee, undefined, adviceFee > 0 ? "#D85A30" : undefined, "%")}
+        {sRowN("Platform / product fee (%/yr)", 0, 10, .05, platformFee, setPlatformFee, undefined, platformFee > 0 ? "#D85A30" : undefined, "%")}
         {otherFees > 0 && (
           <div style={{ fontSize: 11, color: "#888", marginTop: -8, marginBottom: 10 }}>
             Net expected return: <strong style={{ color: "#D85A30" }}>{(ret - otherFees).toFixed(2)}%</strong> (was {ret.toFixed(1)}%, total other fees {otherFees.toFixed(2)}%)
