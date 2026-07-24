@@ -319,6 +319,7 @@ export default function App() {
         {prefix && <span style={{ fontSize: 12, color: col || "#666" }}>{prefix}</span>}
         <input type="number" min={min} max={max} step={step} value={val}
           onChange={e => { const v = e.target.value === "" ? 0 : Number(e.target.value); if (!Number.isNaN(v)) set(v); }}
+          onFocus={e => e.target.select()}
           style={{ flex: 1, width: "100%", padding: "3px 0", fontSize: 12, fontWeight: 600, color: col || "#222", border: "none", outline: "none" }} />
       </div>
     </div>
